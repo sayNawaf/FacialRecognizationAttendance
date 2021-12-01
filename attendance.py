@@ -8,7 +8,7 @@ import pickle
 import mysql.connector
 from datetime import datetime,timedelta
 
-#Connecting with mysql database
+#Connecting with mysql database :)
 #enter your own mysql auth credentials or else will be met with an error
 db = mysql.connector.connect(
     host = 'localhost',
