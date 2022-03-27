@@ -1,0 +1,127 @@
+
+
+{% block content %}
+<!-- Begin page content -->
+
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attender</title>
+    <link rel="stylesheet" href="../static/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@1,800&display=swap" rel="stylesheet">
+
+</head>
+<body>
+    <header id="header">
+       
+        <div class="nav-link">
+            <a href="#link1">Contact Us</a>
+            <a href="{{ url_for('logout')}}">Logout</a> 
+            <a href="{{ url_for('HomePage')}}">Home Page</a>
+            <a style="float:left;" class="right1" href="#">Attender</a>
+        </div>
+    </header>
+    <br><br><br><br>
+
+    <div>
+        <br><br>
+        <form action="{{ url_for('attendanceTable')}}" method="post" id="survey-form" enctype="multipart/form-data">
+        <br><br><br><br>
+        <label for="date">Change Date</label>
+        <input type="date" id="date" name="date">
+        <br><br><br><br>
+        {% if status == "present" %}
+        <h2><input type="radio" name="status" value="present" checked > Students Present<br></h2>
+        <br>
+        <h2><input type="radio" name="status" value="absent" > Students Absent<br></h2>
+        {% else %}
+        <h2><input type="radio" name="status" value="present" > Students Present<br></h2>
+        <br>
+        <h2><input type="radio" name="status" value="absent" checked> Students Absent<br></h2>
+        {% endif %}
+        <br><br>
+        <button id="submit" type="submit"> Submit</button>
+        <br><br>
+    </form>
+</div>
+
+<br><br>
+<div>
+    <br><br><br><br>
+    {% if periods[0] == 0 %}
+    <h1>You Have not taken any attendance today</h1>
+    {% endif %}
+    {% for subject in subject_name %} 
+    <br>
+    <div>
+
+    {% set outer_loop = loop %}
+
+      {% for period in periods %}  
+      <br><br><br>
+      <div>
+        {% for no in range(period) %}
+        <div>
+            <h1>Students {{status}} for {{subject}} (SEM-{{SEM[outer_loop.index0]}}) period no-{{no+1}} on {{date}}</h1>
+            
+               <table>
+                {% if status == "present" %}
+               <tr>
+                  <th>USN</th>
+                  
+                  <th>NAME</th>
+                  <th>DATE</th>
+                  <th>Time</th>
+               </tr>
+               
+               {% else %}
+               <tr>
+                  <th>USN</th>
+                  
+                  <th>NAME</th>
+                  <th>MOBILE</th>
+                  
+               </tr>
+               {% endif %}
+
+               {% for e in records[no] %}
+               {% if status == "present" %}
+                  <tr>
+                     <td>{{ e.USN}}</td>
+                     <td>{{ e.NAME }}</td>
+                     <td>{{ e.Date }}</td>
+                     <td>{{ e.Time }}</td>
+                     
+                  </tr>
+                  
+
+                {% else %}
+                  <tr>
+                     <td>{{ e.USN}}</td>
+                     <td>{{ e.NAME }}</td>
+                     <td>{{ e.MOBILE }}</td>
+                     
+                     
+                  </tr>
+                  {% endif %}
+               {% endfor %}
+            
+               </table>
+      </div>
+      <br><br>
+            {% endfor %}
+        </div>
+         {% endfor %}
+    </div>
+        {% endfor %}
+    </div>
+      
+</body>
+</html>
+{% endblock %} 

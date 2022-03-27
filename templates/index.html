@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attender</title>
+    <link rel="stylesheet" href="../static/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@1,800&display=swap" rel="stylesheet">
+
+</head>
+<body>
+    <header id="header">
+       
+        <div class="nav-link">
+            <a href="#link1">Contact Us</a>
+            <a href="{{ url_for('logout')}}">Logout</a> 
+            <a href="{{ url_for('HomePage')}}">Home Page</a>
+            <a style="float:left;" class="right1" href="#">Attender</a>
+        </div>
+    </header>
+
+    
+    <div class="box-1">  
+            <p>
+            SMART Attender<br>Facial recognition Attendance Managment<br>{{ msg }}</p>
+            <br>
+            
+            
+            
+    </div>
+
+    
+<div class="row">
+    <div class="col">
+        <a href="{{ url_for('TakeAttendance')}}">   <!-- will add link here -->
+            <img src="../static/images/mental_health.png" alt="image-1">   <!-- box size:-width 350px and height 240px so set the image sixe acc to tht -->
+        </a>
+        <br>
+        <br> 
+        <br>
+        <p class="text">Take Attendance</p>
+    </div>
+
+    <div class="col">
+        <a href="{{ url_for('RegisterStudent')}}">   <!-- will add link here -->
+            <img src="../static/images/physical_health.png" alt="image-2">
+        </a>
+        <br><br><br>
+        <p class="text">Register Student</p>
+    </div>
+    <div class="col">
+        <a href="{{ url_for('attendanceTable')}}">   <!-- will add link here -->
+            <img src="../static/images/physical_health.png" alt="image-2">
+        </a>
+        <br><br><br>
+        <p class="text">Todays Attendance</p>
+    </div>
+</div>
+
+
+
+</div>
+
+</body>
+</html>

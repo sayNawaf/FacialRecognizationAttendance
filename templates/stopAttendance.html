@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Registeration</title>
+    <link rel="stylesheet" href="../static/style.css">
+
+</head>
+<body>
+
+    <header id="header">
+<!--        The below div is for the navigation bar -->
+        <div class="nav-link">
+            <a href="#link1">Contact Us</a>
+            <a href="#link2">Games</a> 
+            <a href="#link3">Landing Page</a>
+            <a style="float:left;" class="right1" href="../templates/index.html">Health Gauge</a>
+        </div>
+    </header>
+
+
+<form action="{{ url_for('StopAttendance')}}" method="post" id="survey-form" enctype="multipart/form-data">
+    <h1>STOP TAKING ATTENDANCE</h1>
+    
+         <button id="submit" type="submit"> CLOSE CAM</button>
+         
+
+    </div>
+
+</form>
+
+</body>
+</html>

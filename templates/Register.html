@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Registeration</title>
+    <link rel="stylesheet" href="../static/style.css">
+
+</head>
+<body>
+
+    <header id="header">
+<!--        The below div is for the navigation bar -->
+        <div class="nav-link">
+            <a href="#link1">Contact Us</a>
+            <a href="{{ url_for('logout')}}">Logout</a> 
+            <a href="{{ url_for('HomePage')}}">Home Page</a>
+            <a style="float:left;" class="right1" href="../templates/index.html">Attender</a>
+        </div>
+    </header>
+
+
+<form action="{{ url_for('RegisterStudent')}}" method="post" id="survey-form" enctype="multipart/form-data">
+    <h1>Please Enter the following Credentials to Register:</h1>
+    <br><br>
+        <!-- <label for="Age">Enter your Age: <br></label>       
+             <input type ="text" name="label_age" class="form-control" id="Age">
+             <br><br> -->
+        <label for="Name">Enter Name: <br></label>       
+             <input type="text" name="Name" class="form-control" id="Name">
+             <br><br>
+        <label for="USN">Enter USN: <br></label>       
+             <input type="text" name="USN" class="form-control" id="USN">
+            <br><br>
+        <label for="Number">Enter Mobile Number: <br></label>       
+            <input type="text" name="Number" class="form-control" id="Number">
+           <br><br>
+        <label for="SEM">Enter SEM: <br></label>       
+           <input type="text" name="SEM" class="form-control" id="SEM">
+          <br><br>
+        <label for="Branch">Enter Branch: <br></label>       
+          <input type="text" name="Branch" class="form-control" id="Branch">
+         <br><br>
+        <label for="image">Enter A Passport Size photo: <br></label>
+        <input type="file" name="image">  
+       
+        <br><br><br>
+         <button id="submit" type="submit"> Submit</button>
+         
+
+    </div>
+
+</form>
+
+</body>
+</html>

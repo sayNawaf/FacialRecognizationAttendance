@@ -1,4 +1,5 @@
 
+from logging import exception
 import cv2
 import numpy as np 
 import face_recognition
@@ -10,11 +11,14 @@ from datetime import datetime,timedelta
 
 #Connecting with mysql database :)
 #enter your own mysql auth credentials or else will be met with an error
+
+
 db = mysql.connector.connect(
     host = 'localhost',
     user = 'root',
     passwd = 'nawaf123',
-    database = 'attendance'
+    database = 'attendance',
+    autocommit=True
 )
 #loading my trained model to distinguish beteen similar face and same face
 loaded_model = pickle.load(open('finalized_model.sav', 'rb'))
@@ -22,32 +26,17 @@ loaded_model = pickle.load(open('finalized_model.sav', 'rb'))
 #connected database object
 cursor = db.cursor()
 
-#path where the images of registered faces are residing
-path = "registeredFaces"
-
-#get a list of all names(registered person's name) of images residing in registeredFaces
-dirlist = os.listdir(path)
-images = []
-registered_names = []
-
-for file_name in dirlist:
-    image = cv2.imread(f"{path}/{file_name}")
-
-    #Appending the image(pixel values) in registered faces to list
-    images.append(image)
-
-    #removing the .jpg extension form the image name to get the persons name
-    name = os.path.splitext(file_name)[0]
-    registered_names.append(name)
 
 
 #A function to check if the recognized face of a registered person form the webcam is already marked as present
-def IfAdded(name,check_if_recently_added = False):
+def IfAdded(SubID,usn,pno,check_if_recently_added = False):
     now = datetime.now()
     date = now.strftime("%b-%d-%y")
+    clause = 'SELECT EXISTS(SELECT NAME FROM Attendance WHERE DATE = %s and USN = %s and periodNo = %s and subId = %s)'
     
     #checking in the databse wthere the name has been marked as present for the present date, return 0 or 1 
-    cursor.execute("SELECT EXISTS(SELECT Name FROM Attendace WHERE Date = (%s) and Name = (%s))",(date,name))
+    cursor.execute(clause,(date,usn,pno,SubID))
+    
     
     
 
@@ -59,7 +48,7 @@ def IfAdded(name,check_if_recently_added = False):
             
             if data[0]:
                 #check if added very recentlly,if yes then we can prevent the output frok fluctuating from name Nd unregistered
-                cursor.execute("SELECT last_checked FROM Attendace WHERE Date = (%s) and Name = (%s)",(date,name))
+                cursor.execute("SELECT last_checked FROM Attendance WHERE Date = (%s) and USN = (%s) and periodNo = (%s) and subId = (%s)",(date,usn,pno,SubID))
                 
                 for update_time in cursor:
                     now = now.strftime("%H-%M-%S")
@@ -78,18 +67,21 @@ def IfAdded(name,check_if_recently_added = False):
                         
         
 #function to return the image encodings ie an array of 128 unique measurnments
-def findEncodings(images):
-    registered_face_enc = []
-    for img in images:
+def findEncodings(image):
+    
+    
         #convert from BGR to RGB format
-        img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
+    img = cv2.cvtColor(image,cv2.COLOR_BGR2RGB)
+    try:
         emb = face_recognition.face_encodings(img)[0]
-        
-        registered_face_enc.append(emb)
-    return registered_face_enc
+    except Exception:
+        return None
+    
+    
+    return emb
 
 #function to add the recognised name to the database or to update when ws it last checked
-def addEntity(name,update_last_checked = False):
+def addEntity(SubID,usn,name,pno,update_last_checked = False):
     now = datetime.now()
     date = now.strftime("%b-%d-%y")
     last_checked = now.strftime("%H-%M-%S")
@@ -97,23 +89,67 @@ def addEntity(name,update_last_checked = False):
     
     if not update_last_checked:
         
-        cursor.execute("insert into Attendace(Name,Time,Date,last_checked) values (%s,%s,%s,%s)",(name,last_checked,date,last_checked))
+        cursor.execute("insert into Attendance values (%s,%s,%s,%s,%s,%s,%s)",(name,usn,SubID,pno,date,last_checked,last_checked))
     else:
         print("updatinggg")
         print("unserting-",last_checked)
-        cursor.execute("UPDATE Attendace SET last_checked=(%s) WHERE Name=(%s) and Date = (%s);",(last_checked,name,date))
+        cursor.execute("UPDATE Attendance SET last_checked=(%s) WHERE USN=(%s) and Date = (%s) and periodNo = (%s);",(last_checked,usn,date,pno))
 
     #commit the changes made to the database
     db.commit()
 
+def storeALLEmbeddings():
+    path = "registeredFaces"
 
-registered_face_enc = findEncodings(images)
+    #get a list of all names(registered person's name) of images residing in registeredFaces
+    dirlist = os.listdir(path)
+    images = []
+    registered_names = []
 
-cam = cv2.VideoCapture(0)
+    for file_name in dirlist:
+        image = cv2.imread(f"{path}/{file_name}")
 
-while True:
+        #Appending the image(pixel values) in registered faces to list
+        
+        registered_face_enc = findEncodings(image)
+        print(registered_face_enc[0])
+        new = [float(i) for i in registered_face_enc]
+        
+        #removing the .jpg extension form the image name to get the persons name
+        name = os.path.splitext(file_name)[0]
+        
+        cursor.execute("insert into StudentFaceEncoding values (%s,%s)",(name,str(new)))
+    db.commit()
+
+def storeStudent(filename,USN,SEM,name,mobile,Branch):
+    path = "registeredFaces"
+
+    #get a list of all names(registered person's name) of images residing in registeredFaces
+
+    image = cv2.imread(f"{path}/{filename}")
+
+    #Appending the image(pixel values) in registered faces to list
+    
+    registered_face_enc = findEncodings(image)
+    
+    new = [float(i) for i in registered_face_enc]
+
+    
+    cursor.execute("insert into Students values (%s,%s,%s,%s,%s,%s)",(USN,SEM,name,mobile,str(new),Branch))
+    db.commit()
+        
+
+
+def Start(SubID,frame,registered_names,registered_usn,registered_face_enc,pno):
+    
+   
+    #path where the images of registered faces are residing
+   
+    
+    
+    
     #read each frame from the webcam
-    scuccess,frame = cam.read()
+    
 
     #resize the frame to its 1/4th size
     imageS = cv2.resize(frame,(0,0),None,0.25,0.25)
@@ -128,7 +164,7 @@ while True:
     
     #itterating through each of the face locations and its respective encoding
     for location,encoding in zip(face_locations,face_embeddings):
-
+        
         #checking if the face encodings among the registered faces has macth with the face encoding form the frame
         match = face_recognition.compare_faces(registered_face_enc,encoding)
 
@@ -154,26 +190,27 @@ while True:
             prediction = loaded_model.predict_proba(data)[:,1]
             
             name = registered_names[match_index]
-
+            usn = registered_usn[match_index]
+            print(prediction)
             #through auc curve it was discovered that 61 is the best threshold to ditinguish between both class
-            if prediction*100 > 60.0:
+            if prediction*100 >= 55.0:
                 
                 #check if allready marked in database,if not then add in database
                 #if already  added then update the last_checked parameter
-                if IfAdded(name):
+                if IfAdded(SubID,usn,pno):
                     
-                    addEntity(name,update_last_checked = True)
+                    addEntity(SubID,usn,name,pno,update_last_checked = True)
                     name = f"{name}+Marked"
                 else:
                     
-                    addEntity(name)
+                    addEntity(SubID,usn,name,pno)
                     name = f"{name}+Marked"
-            #if model not confidant that the person has registered,then check if the person has been recently added in 10 sec
+            #if model is not confidant that the person has registered,then check if the person has been recently added in 10 sec
             #if yes chances are the person in veiw is same person and is registered
             #if all above conditions fail the person is not resgistered
             else:
 
-                if  IfAdded(name,check_if_recently_added=True):      
+                if  IfAdded(SubID,usn,pno,check_if_recently_added=True):      
                     name = f"{name}+Marked"
                 else:
                     name = "Not registered"
@@ -184,8 +221,9 @@ while True:
             cv2.rectangle(frame,(x1,y1),(x2,y2),(0,255,0),2)
             cv2.rectangle(frame,(x1,y2-35),(x2,y2),(0,255,0),cv2.FILLED)
             cv2.putText(frame,name,(x1+6,y2-6),cv2.FONT_HERSHEY_SIMPLEX,1,(0,0,0),2)
-
-    #display webcam feed
-    cv2.imshow("webcame",frame)
-    cv2.waitKey(1)
+    return frame
+        #display webcam feed
+        #cv2.imshow("webcame",frame)
+        #cv2.waitKey(1)
+    
 

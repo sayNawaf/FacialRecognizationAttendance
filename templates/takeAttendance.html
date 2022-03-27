@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Registeration</title>
+    <link rel="stylesheet" href="../static/style.css">
+
+</head>
+<body>
+
+    <header id="header">
+<!--        The below div is for the navigation bar -->
+        <div class="nav-link">
+            <a href="#link1">Contact Us</a>
+            <a href="{{ url_for('logout')}}">Logout</a> 
+            <a href="{{ url_for('HomePage')}}">Home Page</a>
+            <a style="float:left;" class="right1" href="../templates/index.html">Attender</a>
+        </div>
+    </header>
+
+
+<form action="{{ url_for('cam')}}" method="post" id="survey-form" enctype="multipart/form-data">
+    <h1>TAKE ATTENDANCE</h1>
+    <br>
+    <label for="pno">Subjects period no:</label>
+<select id="pno" name="pno">
+  <option value=1>1</option>
+  <option value=2>2</option>
+  <option value=3>3</option>
+  <option value=4>4</option>
+  <option value=5>5</option>
+  <option value=6>6</option>
+</select>
+<br>
+<label for="sem">SEM:</label>
+<select id="sem" name="sem">
+  <option value=1>1</option>
+  <option value=2>2</option>
+  <option value=3>3</option>
+  <option value=4>4</option>
+  <option value=5>5</option>
+  <option value=6>6</option>
+  <option value=6>7</option>
+  <option value=6>8</option>
+</select>
+<br><br>
+         <button id="submit" type="submit"> OPEN CAM</button>
+         {{msg}}
+
+    </div>
+
+</form>
+
+</body>
+</html>
